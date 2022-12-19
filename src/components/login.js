@@ -3,8 +3,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -12,10 +10,59 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { configData } from '../config/config';
-
+import axios from 'axios';
+import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { setToken } from '../helpers';
+import { useAuthContext } from '../context/authcontext';
 
 
 export function Login(){
+
+  const navigate = useNavigate();
+
+  const { setUser } = useAuthContext();
+    
+      const [isLoading, setIsLoading] = useState(false);
+    
+      const [error, setError] = useState("");
+    
+      const handlesubmit= async (values) => {
+        setIsLoading(true);
+        try {
+          const value = {
+            identifier: values.email,
+            password: values.password,
+          };
+          const response = await axios.post(configData.Base_URL + '/api/berry-users',value)
+
+        
+    
+          const data = await response.json();
+          if (data?.error) {
+            throw data?.error;
+          } else {
+          
+            setToken(data.jwt);
+    
+          
+            setUser(data.user);
+    
+            alert.success(`Welcome back ${data.user.email}!`);
+    
+            navigate("/profile", { replace: true });
+          }
+        } catch (error) {
+          console.error(error);
+          setError(error?.message ?? "Something went wrong!");
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+  
+    
+
     return(
         <>
             <Container component="main" maxWidth="xs">
@@ -34,7 +81,7 @@ export function Login(){
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <Box component="form"  noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handlesubmit} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               required
@@ -44,6 +91,7 @@ export function Login(){
               name="email"
               autoComplete="email"
               autoFocus
+              
             />
             <TextField
               margin="normal"
@@ -54,11 +102,9 @@ export function Login(){
               type="password"
               id="password"
               autoComplete="current-password"
+              
             />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
+            
             <Button
               type="submit"
               fullWidth
