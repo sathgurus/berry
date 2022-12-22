@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -9,58 +9,79 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { configData } from '../config/config';
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
-import { useState } from 'react';
+import { useAuthContext } from '../context/context';
 import { setToken } from '../helpers';
-import { useAuthContext } from '../context/authcontext';
+import { configData } from '../config/config';
+import { message } from 'antd';
+
 
 
 export function Login(){
-
-  const navigate = useNavigate();
-
+const [input, setInput]= useState({
+  email:'',
+  password:''
+});
   const { setUser } = useAuthContext();
+
+const handlechange = (event) =>{
+  console.log("Event Name", event.target.name);
+  console.log("Event Value", event.target.value);
+ let name = event.target.name;
+ let value = event.target.value;
+  setInput({...input, [name]:value});
+
+
+}
+
+
+
+
+  const handlesubmit = async (values) => {
+    console.log("Val",values);
+  
+   values.preventDefault();
     
-      const [isLoading, setIsLoading] = useState(false);
-    
-      const [error, setError] = useState("");
-    
-      const handlesubmit= async (values) => {
-        setIsLoading(true);
-        try {
-          const value = {
-            identifier: values.email,
-            password: values.password,
-          };
-          const response = await axios.post(configData.Base_URL + '/api/berry-users',value)
+    try {
+      console.log("value input",input);
+      const data = {
+        identifier: input.email,
+        password: input.password,
+      };
+      console.log("value identifier",data);
+      const response = await axios.post(configData.Base_URL +'/auth/local', 
+      //    headers: {
+      //   "Content-Type": "application/json",
+      // },
+     {...data}
+    ).then((res) => {
+      console.log('Well done!');
+      console.log('User profile', res.data.user);
+      // window.location.href='/superdash'
+    });
+console.log("res",response)
+      const info = await response;
+      console.log("res data",info);
+      if (info?.error) {
+        throw info?.error;
+      } else {
+        
+        setToken(info.jwt);
 
         
-    
-          const data = await response.json();
-          if (data?.error) {
-            throw data?.error;
-          } else {
-          
-            setToken(data.jwt);
-    
-          
-            setUser(data.user);
-    
-            alert.success(`Welcome back ${data.user.email}!`);
-    
-            navigate("/profile", { replace: true });
-          }
-        } catch (error) {
-          console.error(error);
-          setError(error?.message ?? "Something went wrong!");
-        } finally {
-          setIsLoading(false);
-        }
-      };
+        setUser(data.user);
 
-  
+        message.success(`Welcome back ${data.user.email}!`);
+        
+
+       
+      }
+    } catch (error) {
+      console.error(error);
+      console.log("Something went wrong!",error);
+      
+    }
+   };
     
 
     return(
@@ -86,22 +107,24 @@ export function Login(){
               margin="normal"
               required
               fullWidth
-              id="email"
+              value= {input.email}
               label="Email Address"
               name="email"
               autoComplete="email"
               autoFocus
+              onChange={(e) =>handlechange(e)}
               
             />
             <TextField
               margin="normal"
               required
               fullWidth
+              value= {input.password}
               name="password"
               label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
+             type='password'
+             
+              onChange={(e)=>handlechange(e)}
               
             />
             
@@ -111,7 +134,7 @@ export function Login(){
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+              Sign In 
             </Button>
             <Grid container>
               <Grid item xs>
@@ -120,14 +143,14 @@ export function Login(){
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="/signup" variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
             </Grid>
           </Box>
         </Box>
-        {/* <Copyright sx={{ mt: 8, mb: 4 }} /> */}
+      
       </Container>
         
         

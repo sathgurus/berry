@@ -1,21 +1,25 @@
 import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Login } from './components/login';
-import { Dashboard } from './components/dashboard';
+import { SignUp } from './components/register';
+import { DashboardContent } from './components/dashboard';
+import { Appheader } from './components/appheader';
 
 function App() {
   return (
-    <>
-    <BrowserRouter>
+    
+    
       <Routes>
         <Route path='/' element={<Login/>}/>
-        <Route path='/superdash' element={<Dashboard/>}/>
+        {/* <Route path='/superdash' element={<DashboardContent/>}/> */}
+        <Route path='/signup' element={<SignUp/>}/>
+        <Route path='/superdash' element={<Appheader/>}/>
       </Routes>
 
-    </BrowserRouter>
     
     
-    </>
+    
+    
   );
 }
 
