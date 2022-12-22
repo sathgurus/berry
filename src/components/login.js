@@ -57,7 +57,7 @@ const handlechange = (event) =>{
     ).then((res) => {
       console.log('Well done!');
       console.log('User profile', res.data.user);
-      // window.location.href='/superdash'
+      window.location.href='/superdash'
     });
 console.log("res",response)
       const info = await response;

@@ -15,72 +15,61 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import axios from 'axios';
 import { configData } from '../config/config';
-import { message } from 'antd';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { setToken } from '../helpers';
-import { useAuthContext } from '../context/context';
-import { useState } from 'react';
-import { Autocomplete } from '@mui/material';
-import { Public } from '@mui/icons-material';
 
 
 
 
 export  function SignUp() {
-
-
-  const navigate = useNavigate();
-
-  const { setUser } = useAuthContext();
-
-  const handlesubmit = async(event) =>{
-    event.preventDefault();
-    
-    
-    var username=document.getElementById('username').value;
-    var email=document.getElementById('email').value;
-    var password=document.getElementById('password').value;
-    
-
-    const users={
-      data:{
-      username:username,
-      email:email,
-      password:password
-    }
-  }
-
   
-     const response =  axios.post(configData.Base_URL + '/users',users)
-
-     console.log("response",response);
-     const info = await response.json();
-     if (info?.error) {
-       throw info?.error;
-     } else {
-      
-       setToken(info.jwt)
-
-       setUser(info.user)
-
-      
-      .then(function(res){
+    const handlesubmit = async(event) =>{
+        event.preventDefault();
         
-        alert('successful');
-        console.log('response',res);
+        var firstname=document.getElementById('firstName').value;
+        var lastname=document.getElementById('lastName').value;
+        var email=document.getElementById('email').value;
+        var password=document.getElementById('password').value;
         
     
-        // window.location.href='/superdash';
-      })
-      .catch(function(error){
-        console.log("error",error);
-        alert(error);
-        window.location.reload();
-      })
-  }
-  }
+        const users={
+          data:{
+          firstname:firstname,
+          lastname:lastname,
+          email:email,
+          password:password
+        }
+      }
 
-
+      if(firstname ==='' || firstname === null){
+        alert('Enter the firstname');
+      }
+      else if(lastname ==='' || lastname === null){
+        alert('Enter the lastname');
+      }
+        else if(email ==='' || email === null){
+          alert('Enter the Email');
+    
+        }
+        else if(password === '' || password === null){
+          alert('Enter the Passowrd');
+        }
+        else{
+           axios.post(configData.Base_URL + '/berry-users',users)
+          
+          .then(function(res){
+            
+            alert('successful');
+            console.log('response',res);
+            let id=res.data.id;
+            localStorage.setItem('userid',id);
+            window.location.href='/superdash';
+          })
+          .catch(function(error){
+            console.log("error",error);
+            alert(error);
+            // window.location.reload();
+          })
+      }
+      }
 
   return (
     
@@ -102,7 +91,7 @@ export  function SignUp() {
           </Typography>
           <Box component="form" noValidate onSubmit={handlesubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
-              {/* <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={6}>
                 <TextField
                   autoComplete="given-name"
                   name="firstName"
@@ -121,19 +110,8 @@ export  function SignUp() {
                   label="Last Name"
                   name="lastName"
                   autoComplete="family-name"
-                /> */}
-              {/* </Grid> */}
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  id="username"
-                  label="username"
-                  name="username"
-                  autoComplete="username"
                 />
-                </Grid>
-
+              </Grid>
               <Grid item xs={12}>
                 <TextField
                   required
@@ -143,8 +121,7 @@ export  function SignUp() {
                   name="email"
                   autoComplete="email"
                 />
-                </Grid>
-              
+              </Grid>
               <Grid item xs={12}>
                 <TextField
                   required
@@ -173,7 +150,6 @@ export  function SignUp() {
                 </Link>
               </Grid>
             </Grid>
-        
           </Box>
         </Box>
     
